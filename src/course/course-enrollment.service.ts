@@ -7,7 +7,7 @@ import { Course, Enrollment, User } from "src/database/models";
 import { EnrollmentStatus } from "src/database/models/enrollment.model";
 
 @Injectable()
-export class CourseEnrollment extends BaseService{
+export class CourseEnrollment extends BaseService {
     constructor(
         private readonly courseService: CourseService,
         private readonly userService: UserService,
@@ -17,10 +17,10 @@ export class CourseEnrollment extends BaseService{
 
     async enrollStudent({ matricNo, code, name }: EnrollmentDto) {
         await this.userService.getUserByMatric(matricNo);
-        await this.courseService.getCourse({code, name});
+        await this.courseService.getCourse({ code, name });
 
-        const enrolled = await Enrollment.findOne({where: {matricNo, code}});
-        if(enrolled) return this.HandleError(
+        const enrolled = await Enrollment.findOne({ where: { matricNo, code } });
+        if (enrolled) return this.HandleError(
             new ConflictException('You have already enrolled for this course.')
         );
 
@@ -37,10 +37,10 @@ export class CourseEnrollment extends BaseService{
 
     async unenrollStudent({ matricNo, code, name }: EnrollmentDto) {
         await this.userService.getUserByMatric(matricNo);
-        await this.courseService.getCourse({code, name});
+        await this.courseService.getCourse({ code, name });
 
-        const enrollment = await Enrollment.findOne({where: {matricNo, code}});
-        if(!enrollment) return this.HandleError(
+        const enrollment = await Enrollment.findOne({ where: { matricNo, code } });
+        if (!enrollment) return this.HandleError(
             new ConflictException('You have not enrolled for this course.')
         );
 
@@ -49,11 +49,11 @@ export class CourseEnrollment extends BaseService{
         await enrollment.save();
 
         return this.Results(enrollment);
-    } 
+    }
 
     async renrollStudent({ matricNo, code, name }: EnrollmentDto) {
-        const enrollment = await Enrollment.findOne({where: {matricNo, code}});
-        if(!enrollment) return this.HandleError(
+        const enrollment = await Enrollment.findOne({ where: { matricNo, code } });
+        if (!enrollment) return this.HandleError(
             new NotFoundException('Dropped enrollment not found')
         );
 
@@ -76,13 +76,13 @@ export class CourseEnrollment extends BaseService{
 
     async getStudentCourses(matricNo: string) {
         const enrolledCourses = await Enrollment.findAll({
-          where: { matricNo: matricNo, status: EnrollmentStatus.ACTIVE },
-          include: [{ model: Course }]
+            where: { matricNo: matricNo, status: EnrollmentStatus.ACTIVE },
+            include: [{ model: Course }]
         });
         const courses = enrolledCourses.map(enrollment => enrollment.code);
-    
+
         return this.Results(courses);
-     }
+    }
 
     async getEnrolledStudents(code: string) {
         const enrrolments = await Enrollment.findAll({
@@ -95,7 +95,7 @@ export class CourseEnrollment extends BaseService{
         return this.Results(students);
     }
 
-    async getEnrollmentStatus({matricNo, code}: EnrollmentDto) {
+    async getEnrollmentStatus({ matricNo, code }: EnrollmentDto) {
         const enrollment = await Enrollment.findOne({ where: { matricNo, code } });
 
         const status = enrollment ? enrollment.status : EnrollmentStatus.NOT_ENROLLED;
@@ -103,7 +103,7 @@ export class CourseEnrollment extends BaseService{
         return this.Results(status);
     }
 
-    async bulkEnroll({matricNos, code, name}: bulkEnrollDto) {
+    async bulkEnroll({ matricNos, code, name }: bulkEnrollDto) {
         await this.courseService.getCourse({ code, name });
 
         const enrrolments = await Promise.all(
