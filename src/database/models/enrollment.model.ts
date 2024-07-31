@@ -1,6 +1,6 @@
 import { Table, Column, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { DataTypes } from 'sequelize';
-import { User, Course} from '.'; 
+import { User, Course } from '.';
 
 export enum EnrollmentStatus {
   ACTIVE = 'active',
@@ -9,7 +9,7 @@ export enum EnrollmentStatus {
   NOT_ENROLLED = 'not_enrolled'
 }
 
-@Table
+@Table //Enrroll students
 export class Enrollment extends Model<Enrollment> {
   @ForeignKey(() => User)
   @Column
@@ -18,19 +18,19 @@ export class Enrollment extends Model<Enrollment> {
   @ForeignKey(() => Course)
   @Column
   code: string;
-    // @Column({ 
-    //   type: DataTypes.STRING, 
-    //   allowNull: false,
-    //   defaultValue: 'not_enrolled',
-    //   values: ['active', 'dropped', 'completed', 'not_enrolled']
-    // })
-    // status: 'active'| 'dropped' | 'completed' | 'not_enrolled' ;
-  @Column({ 
-    type: DataTypes.ENUM(...Object.values(EnrollmentStatus)), 
+  // @Column({ 
+  //   type: DataTypes.STRING, 
+  //   allowNull: false,
+  //   defaultValue: 'not_enrolled',
+  //   values: ['active', 'dropped', 'completed', 'not_enrolled']
+  // })
+  // status: 'active'| 'dropped' | 'completed' | 'not_enrolled' ;
+  @Column({
+    type: DataTypes.ENUM(...Object.values(EnrollmentStatus)),
     allowNull: false,
     defaultValue: EnrollmentStatus.NOT_ENROLLED
   })
-  status: EnrollmentStatus ;
+  status: EnrollmentStatus;
 
 
 

@@ -11,7 +11,7 @@ export class Lecture extends Model<Lecture> {
         type: DataTypes.STRING,
     })
     public id: string;
-    
+
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -24,6 +24,24 @@ export class Lecture extends Model<Lecture> {
     })
     content: string;
 
+    @Column({
+        type: DataType.DATE,
+        allowNull: false,
+    })
+    date: Date;
+
+    @Column({
+        type: DataType.ENUM('TEXT', 'VIDEO', 'PDF'),
+        allowNull: false,
+    })
+    type: 'TEXT' | 'VIDEO';
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
+    videoUrl: string;
+
     @ForeignKey(() => Course)
     @Column({
         type: DataType.STRING,
@@ -34,3 +52,27 @@ export class Lecture extends Model<Lecture> {
     @BelongsTo(() => Course)
     course: Course;
 }
+
+//     @ForeignKey(() => Course)
+//     @Column({
+//         type: DataType.STRING,
+//         allowNull: false,
+//     })
+//     courseId: string;
+
+//     @ForeignKey(() => Lecturer)
+//     @Column({
+//         type: DataType.STRING,
+//         allowNull: false,
+//     })
+//     lecturerId: string;
+
+//     @BelongsTo(() => Course)
+//     course: Course;
+
+//     @BelongsTo(() => Lecturer)
+//     lecturer: Lecturer;
+
+//     @HasMany(() => CourseMaterial)
+//     materials: CourseMaterial[];
+// }

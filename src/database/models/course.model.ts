@@ -1,6 +1,6 @@
-import { Column, Model, Table, DataType, BelongsToMany, HasOne, PrimaryKey, IsUUID, HasMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, ForeignKey, PrimaryKey, IsUUID, HasMany, BelongsTo, Index } from 'sequelize-typescript';
 import { DataTypes, UUIDV4 } from 'sequelize';
-import { User, StudentCourses, Lecture, Enrollment } from './';
+import { User, Lecture, Enrollment, CourseLecturer } from './';
 
 @Table
 export class Course extends Model<Course> {
@@ -18,10 +18,11 @@ export class Course extends Model<Course> {
   })
   name: string;
 
+  @Index
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    unique: true 
+    unique: true
   })
   code: string;
 
@@ -37,22 +38,40 @@ export class Course extends Model<Course> {
   })
   description: string;
 
-  // @BelongsToMany(() => User, () => StudentCourses)
-  // students: User[];
+  // @ForeignKey(() => Course)
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: false,
+  // })
+  // courseId: string;
 
-
-  // @HasMany(() => CourseEnrollment)
-  // enrollments: CourseEnrollment[];
-
-  @HasOne(() => Lecture)
-  lecture: Lecture;
+  // @BelongsTo(() => Course)
+  // course: Course;
 
   @BelongsToMany(() => User, () => Enrollment)
-  users: User[];
+  enrroledStudents: User[];
+
+  @HasMany(() => CourseLecturer, {
+    sourceKey: 'code',
+    foreignKey: 'courseCode'
+  })
+  courseLecturers: CourseLecturer[];
+
+  @BelongsToMany(() => User, {
+    through: () => CourseLecturer,
+    otherKey: 'lecturerId',
+    foreignKey: 'courseCode',
+    as: 'lecturers'
+  })
+  lecturers?: User[];
+
+  // @BelongsToMany(() => User, () => CourseLecturer)
+  // lecturers: User[];
+
+  @HasMany(() => Lecture)
+  lectures: Lecture[];
 
   async getCourse() {
     return await Course;
   }
 }
-
-

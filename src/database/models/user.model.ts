@@ -1,7 +1,7 @@
-import { Column, PrimaryKey, IsUUID, Model, BelongsToMany, Table, HasMany } from 'sequelize-typescript';
-  import { DataTypes, UUIDV4 } from 'sequelize';
+import { Column, PrimaryKey, IsUUID, Model, BelongsToMany, Table, HasMany, Index } from 'sequelize-typescript';
+import { DataTypes, UUIDV4 } from 'sequelize';
 import * as bcrypt from 'bcryptjs';
-import { Course, StudentCourses, Enrollment} from './';
+import { Course, Enrollment, CourseLecturer } from './';
 
 @Table
 export class User extends Model {
@@ -12,26 +12,27 @@ export class User extends Model {
     type: DataTypes.STRING,
   })
   public id: string;
-  
+
   @Column({ type: DataTypes.STRING, allowNull: false, unique: true })
   public email: string;
-  
+
+  @Index //Unique Id for student
   @Column({ type: DataTypes.STRING, allowNull: false, unique: true })
   public matricNo: string;
-  
+
   @Column({ type: DataTypes.STRING })
-  public name: string;
+  public fullName: string;
 
   @Column({ type: DataTypes.STRING })
   public phone: string;
-  
+
   @Column({
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM,
     values: ['student', 'lecturer', 'admin'],
     defaultValue: 'student',
   })
-  public type: 'student' | 'lecturer' | 'admin';   
-  
+  public type: 'student' | 'lecturer' | 'admin';
+
   @Column({
     type: DataTypes.STRING,
     set(value: string) {
@@ -41,27 +42,32 @@ export class User extends Model {
   })
   public password: string;
 
-  // @BelongsToMany(() => Course, () => StudentCourses)
-  // courses: Course[];
-
-  @BelongsToMany(() => Course, () => Enrollment)
-  courses: Course[];
-
-  // @HasMany(() => CourseEnrollment)
-  // enrollments: CourseEnrollment[];
-  
   @Column({ type: DataTypes.STRING })
   public avatar: string;
-  
-    // toJSON() {
-    //   const data = this.dataValues;
-    //   delete data.password;
-    //   delete data.totp;
-    //   delete data.deletedAt;
-  
-    //   return data;
-    // }
-  
+
+  @HasMany(() => CourseLecturer)
+  courseLecturers: CourseLecturer[];
+
+  @BelongsToMany(() => Course, () => Enrollment)//Courses a student has registerd for
+  EnrolledCourses: Course[];
+
+  @BelongsToMany(() => Course, {
+    through: () => CourseLecturer,
+    otherKey: 'courseCode',
+    foreignKey: 'lecturerId',
+    as: 'AssignedCourses'
+  })//Courses lectures are assigned to
+  AssignedCourses?: Course[];
+
+  // toJSON() {
+  //   const data = this.dataValues;
+  //   delete data.password;
+  //   delete data.totp;
+  //   delete data.deletedAt;
+
+  //   return data;
+  // }
+
   validatePassword(val: string) {
     return bcrypt.compareSync(val, this.getDataValue('password'));
   }

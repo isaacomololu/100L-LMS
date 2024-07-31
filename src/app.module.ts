@@ -4,14 +4,14 @@ import { AuthModule } from './auth/auth.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
-import { Course, Enrollment, Lecture, StudentCourses, User } from './database/models';
+import { Course, Enrollment, Lecture, CourseLecturer, User } from './database/models';
 import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
-    UserModule, 
+    UserModule,
     AuthModule,
     SequelizeModule.forRoot({
       dialect: 'postgres',
@@ -22,10 +22,10 @@ import { CourseModule } from './course/course.module';
       database: 'postgres',
       logging: false,
       models: [
-        User, 
-        Lecture, 
-        Course, 
-        StudentCourses, 
+        User,
+        Lecture,
+        Course,
+        CourseLecturer,
         Enrollment
       ],
       autoLoadModels: true,
@@ -36,4 +36,4 @@ import { CourseModule } from './course/course.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }
