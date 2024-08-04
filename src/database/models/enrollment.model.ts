@@ -1,6 +1,6 @@
 import { Table, Column, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { DataTypes } from 'sequelize';
-import { User, Course } from '.';
+import { Student, Course } from '.';
 
 export enum EnrollmentStatus {
   ACTIVE = 'active',
@@ -11,28 +11,20 @@ export enum EnrollmentStatus {
 
 @Table //Enrroll students
 export class Enrollment extends Model<Enrollment> {
-  @ForeignKey(() => User)
+  @ForeignKey(() => Student)
   @Column
-  matricNo: string;
+  public matricNo: string;
 
   @ForeignKey(() => Course)
   @Column
-  code: string;
-  // @Column({ 
-  //   type: DataTypes.STRING, 
-  //   allowNull: false,
-  //   defaultValue: 'not_enrolled',
-  //   values: ['active', 'dropped', 'completed', 'not_enrolled']
-  // })
-  // status: 'active'| 'dropped' | 'completed' | 'not_enrolled' ;
+  public code: string;
+
   @Column({
     type: DataTypes.ENUM(...Object.values(EnrollmentStatus)),
     allowNull: false,
     defaultValue: EnrollmentStatus.NOT_ENROLLED
   })
-  status: EnrollmentStatus;
-
-
+  public status: EnrollmentStatus;
 
   @Column({ type: DataTypes.DATE, allowNull: false })
   public enrollmentDate: Date;
@@ -40,11 +32,9 @@ export class Enrollment extends Model<Enrollment> {
   @Column({ type: DataTypes.DATE, allowNull: true })
   public dropDate: Date;
 
-  @BelongsTo(() => User)
-  user: User;
+  @BelongsTo(() => Student)
+  public student: Student;
 
   @BelongsTo(() => Course)
-  course: Course;
+  public course: Course;
 }
-
-

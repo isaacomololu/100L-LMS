@@ -2,9 +2,9 @@ import { Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsString, IsUUID, IsEmail } from 'class-validator';
 
 export class SignupDto {
-  // @IsUUID('4')
-  // @IsNotEmpty()
-  // id: string;
+  @IsString()
+  @IsNotEmpty()
+  matricNo: string;
 
   @IsEmail()
   @IsNotEmpty()
@@ -12,11 +12,11 @@ export class SignupDto {
 
   @IsString()
   @IsNotEmpty()
-  matricNo: string;
+  firstName: string;
 
   @IsString()
   @IsNotEmpty()
-  fullName: string;
+  otherName: string;
 
   @IsString()
   @IsNotEmpty()
@@ -25,10 +25,6 @@ export class SignupDto {
   @IsString()
   @IsNotEmpty()
   phone: string;
-
-  @IsEnum(['student', 'lecturer', 'admin'])
-  @IsNotEmpty()
-  type: 'student' | 'lecturer' | 'admin';
 
   @IsString()
   @IsNotEmpty()

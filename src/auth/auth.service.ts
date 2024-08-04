@@ -2,10 +2,9 @@ import { Injectable, UnauthorizedException, BadRequestException, NotFoundExcepti
 import { JwtService } from '@nestjs/jwt';
 import { BaseService } from 'src/common';
 import { JWTPayload } from './auth.interface';
-import { User } from 'src/database/models';
+import { Student } from 'src/database/models';
 import { SigninDto, SignupDto, PasswordResetDTO } from './dto';
 import { Op } from 'sequelize';
-import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService extends BaseService {
@@ -38,29 +37,24 @@ export class AuthService extends BaseService {
   }
 
   async signup(payload: SignupDto) {
-    const { email, matricNo, fullName, ...rest } = payload
+    const { email, matricNo, firstName, ...rest } = payload
 
-    const exist = await User.findOne({ where: { [Op.or]: [/*{ id }*/, { email }, { fullName }, { matricNo }] } });
+    const exist = await Student.findOne({ where: { [Op.or]: [{ email }, { matricNo }] } });
     if (exist)
       return this.HandleError(
         new BadRequestException('User already exist')
       );
 
-    if (exist?.fullName === fullName)
-      return this.HandleError(
-        new BadRequestException('User with this name already exists')
-      );
-
     if (exist?.matricNo === matricNo)
       return this.HandleError(
-        new BadRequestException('User with this matric number already exists')
+        new BadRequestException('User with this Matriculation Number already exists')
       );
 
-    const user = await User.create({
+    const user = await Student.create({
       ...rest,
       email,
       matricNo,
-      fullName
+      firstName
     });
 
     return this.Results(user);
@@ -69,25 +63,25 @@ export class AuthService extends BaseService {
   async signin(payload: SigninDto) {
     const { matricNo, password } = payload
 
-    const user = await await User.findOne({ where: { matricNo } });;
+    const student = await await Student.findOne({ where: { matricNo } });;
 
-    if (!user || !user.validatePassword(password))
+    if (!student || !student.validatePassword(password))
       return this.HandleError(
         new BadRequestException("Incorrect Credentials")
       );
 
-    const accessToken = this.signJWT(user);
+    const accessToken = this.signJWT(student);
 
     return this.Results(accessToken);
   }
 
   async initiatePasswordReset(payload: PasswordResetDTO) {
-    const { email } = payload;
-    const user = await User.findOne({ where: { email } });
+    const { email, matricNo } = payload;
+    const student = await Student.findOne({ where: { matricNo } });
 
-    if (!user)
+    if (!student)
       return this.HandleError(
-        new NotFoundException('User not found')
+        new NotFoundException('Student not found')
       );
 
     // const token = user.generateTotp(5, 30);

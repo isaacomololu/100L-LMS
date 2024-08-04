@@ -1,6 +1,6 @@
 import { IsArray, IsNotEmpty, IsString } from "class-validator";
 
-export class BulkassignLectures {
+export class BulkassignLecturesDto {
     @IsString()
     @IsArray()
     @IsNotEmpty()

@@ -11,21 +11,21 @@ export class AuthController extends BaseController {
 
     @Post('signup')
     async signUp(@Body() form: SignupDto) {
-        const user = await this.authService.signup(form);
-        if(user.errMessage) throw user.error;
+        const student = await this.authService.signup(form);
+        if (student.errMessage) throw student.error;
         return this.response({
-            message: 'User Created Succesfully', 
-            data: user.data,
+            message: 'Student Created Succesfully',
+            data: student.data,
         });
     }
 
     @Post('signin')
     async signIn(@Body() form: SigninDto) {
-        const user = await this.authService.signin(form);
-        if(user.errMessage) throw user.error;
+        const student = await this.authService.signin(form);
+        if (student.errMessage) throw student.error;
         return this.response({
-            message: 'User Signed-in Succesfully', 
-            data: user.data,
+            message: 'Student Signed-in Succesfully',
+            data: student.data,
         });
     }
 }

@@ -1,75 +1,49 @@
 import { Column, Model, Table, DataType, BelongsToMany, ForeignKey, PrimaryKey, IsUUID, HasMany, BelongsTo, Index } from 'sequelize-typescript';
-import { DataTypes, UUIDV4 } from 'sequelize';
-import { User, Lecture, Enrollment, CourseLecturer } from './';
+import { Lecturer, Lecture, Student } from './';
 
 @Table
 export class Course extends Model<Course> {
-  @IsUUID('4')
   @PrimaryKey
-  @Column({
-    defaultValue: UUIDV4,
-    type: DataTypes.STRING,
-  })
-  public id: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  name: string;
-
-  @Index
   @Column({
     type: DataType.STRING,
     allowNull: false,
     unique: true
   })
-  code: string;
+  public code: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  unit: string;
+  public name: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  description: string;
+  public unit: string;
 
-  // @ForeignKey(() => Course)
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: false,
-  // })
-  // courseId: string;
-
-  // @BelongsTo(() => Course)
-  // course: Course;
-
-  @BelongsToMany(() => User, () => Enrollment)
-  enrroledStudents: User[];
-
-  @HasMany(() => CourseLecturer, {
-    sourceKey: 'code',
-    foreignKey: 'courseCode'
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
   })
-  courseLecturers: CourseLecturer[];
+  public description: string;
 
-  @BelongsToMany(() => User, {
-    through: () => CourseLecturer,
-    otherKey: 'lecturerId',
+  // @BelongsToMany(() => Student, () => Enrollment)
+  // enroledStudents: Student[];
+  @BelongsToMany(() => Student, {
+    through: 'Enrollment',
     foreignKey: 'courseCode',
-    as: 'lecturers'
+    otherKey: 'matricNo'
   })
-  lecturers?: User[];
+  public enrolledStudents: Student[];
 
-  // @BelongsToMany(() => User, () => CourseLecturer)
-  // lecturers: User[];
+  @HasMany(() => Lecturer, {
+  })
+  public lecturers: Lecturer[];
 
   @HasMany(() => Lecture)
-  lectures: Lecture[];
+  public lectures: Lecture[];
 
   async getCourse() {
     return await Course;

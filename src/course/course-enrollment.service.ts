@@ -2,21 +2,21 @@ import { ConflictException, Injectable, NotFoundException } from "@nestjs/common
 import { BaseService } from "src/common";
 import { EnrollmentDto, bulkEnrollDto } from "./dtos";
 import { CourseService } from "./course.service";
-import { UserService } from "src/user/user.service";
-import { Course, Enrollment, User } from "src/database/models";
+import { Course, Enrollment, Student } from "src/database/models";
 import { EnrollmentStatus } from "src/database/models/enrollment.model";
+import { StudentService } from "src/student/student.service";
 
 @Injectable()
 export class CourseEnrollment extends BaseService {
     constructor(
         private readonly courseService: CourseService,
-        private readonly userService: UserService,
+        private readonly studentService: StudentService,
     ) {
         super();
     }
 
     async enrollStudent({ matricNo, code, name }: EnrollmentDto) {
-        await this.userService.getUserByMatric(matricNo);
+        await this.studentService.getStudentByMatric({ matricNo });
         await this.courseService.getCourse({ code, name });
 
         const enrolled = await Enrollment.findOne({ where: { matricNo, code } });
@@ -36,7 +36,7 @@ export class CourseEnrollment extends BaseService {
     }
 
     async unenrollStudent({ matricNo, code, name }: EnrollmentDto) {
-        await this.userService.getUserByMatric(matricNo);
+        await this.studentService.getStudentByMatric({ matricNo });
         await this.courseService.getCourse({ code, name });
 
         const enrollment = await Enrollment.findOne({ where: { matricNo, code } });
@@ -87,7 +87,7 @@ export class CourseEnrollment extends BaseService {
     async getEnrolledStudents(code: string) {
         const enrrolments = await Enrollment.findAll({
             where: { code: code, status: EnrollmentStatus.ACTIVE },
-            include: [{ model: User }]
+            include: [{ model: Student }]
         });
 
         const students = enrrolments.map(enrrolment => enrrolment.matricNo);

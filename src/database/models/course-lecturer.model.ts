@@ -1,9 +1,9 @@
 import { Table, Column, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { User, Course } from './';
+import { Student, Course } from './';
 
 @Table //Register Lecturers
 export class CourseLecturer extends Model<CourseLecturer> {
-    @ForeignKey(() => User)
+    @ForeignKey(() => Student)
     @Column
     lecturerId: string;
 
@@ -11,8 +11,8 @@ export class CourseLecturer extends Model<CourseLecturer> {
     @Column
     courseCode: string;
 
-    @BelongsTo(() => User)
-    lecturer: User;
+    @BelongsTo(() => Student)
+    lecturer: Student;
 
     @BelongsTo(() => Course, {
         targetKey: 'code',
