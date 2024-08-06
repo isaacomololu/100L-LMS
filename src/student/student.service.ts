@@ -22,7 +22,7 @@ export class StudentService extends BaseService {
     const user = await Student.findOne({ where: { matricNo } });
     if (!user)
       return this.HandleError(
-        new NotFoundException('User not found'),
+        new NotFoundException('Student not found'),
       );
     return this.Results(user);
   }
@@ -37,21 +37,17 @@ export class StudentService extends BaseService {
     return this.Results(user);
   }
 
-  async updateStudentProfile(
-    {
-      matricNo,
+  async updateStudentProfile(matricNo: string, payload: UpdateStudentProfileDto) {
+    const {
       email,
       firstName,
       otherName,
       phone,
       avatar
-    }: UpdateStudentProfileDto
-  ) {
-    const getStudent = await this.getStudentByMatric({ matricNo });
-
-    if (getStudent.isError || !getStudent.data) return getStudent;
-
-    const student = getStudent.data;
+    } = payload;
+    const student = await Student.findOne({ where: { matricNo } });
+    if (!student)
+      return this.HandleError(new NotFoundException('Student Not Found'));
 
     const updatePayload: any = {
       ...(matricNo ? { matricNo } : {}),
@@ -63,21 +59,21 @@ export class StudentService extends BaseService {
     };
 
     await student.update(updatePayload);
+    return this.Results(student);
   }
 
-  async updatePassword(matricNo: string, { newPassword, password }: ChangePasswordDto) {
-    const getUser = await this.getStudentByMatric({ matricNo });
+  async updatePassword(matricNo: string, payload: ChangePasswordDto) {
+    const { newPassword, password } = payload;
+    const student = await Student.findOne({ where: { matricNo } });
+    if (!student)
+      return this.HandleError(new NotFoundException('Student Not Found'));
 
-    if (getUser.isError || !getUser.data) return getUser;
-
-    const user = getUser.data;
-
-    if (!user.validatePassword(password))
+    if (!student.validatePassword(password))
       return this.HandleError(new BadRequestException('Password is incorrect'));
 
-    await user.update({ password: newPassword });
+    await student.update({ password: newPassword });
 
-    return this.Results(user);
+    return this.Results(student);
   }
 
   async dropStudent(matricNo: string) {
@@ -115,6 +111,23 @@ export class StudentService extends BaseService {
     return this.Results(enroll);
   }
 
+  // async unenroll(payload: EnrollStudentDto) {
+  //   const { matricNo, code } = payload;
+
+  //   const student = await Student.findOne({ where: { matricNo } });
+  //   if (!student)
+  //     return this.HandleError(new NotFoundException('Student Not Found'));
+
+  //   const enrolled = await Enrollment.findOne({ where: { matricNo } });
+  //   if (!enrolled)
+  //     return this.HandleError(new NotFoundException('This student is not enrrolled'));
+
+  //   enrolled.status = EnrollmentStatus.DROPPED;
+  //   enrolled.dropDate = new Date();
+  //   await enrolled.save();
+  //   return this.Results(enrolled);
+  // }
+
   async unenroll(payload: EnrollStudentDto) {
     const { matricNo, code } = payload;
 
@@ -126,13 +139,13 @@ export class StudentService extends BaseService {
     if (!enrolled)
       return this.HandleError(new NotFoundException('This student is not enrrolled'));
 
-    enrolled.status = EnrollmentStatus.DROPPED;
-    enrolled.dropDate = new Date();
-    await enrolled.save();
-    return this.Results(enrolled);
+    await enrolled.destroy();
+
+    return this.Results(null);
   }
 
-  async renrollStudent({ matricNo, code }: EnrollStudentDto) {
+  async renrollStudent(payload: EnrollStudentDto) {
+    const { matricNo, code } = payload;
     const enrollment = await Enrollment.findOne({ where: { matricNo, code } });
     if (!enrollment)
       return this.HandleError(new NotFoundException('This student has not enrolled for this course'));
@@ -146,7 +159,8 @@ export class StudentService extends BaseService {
     return this.Results(enrollment);
   }
 
-  async bulkEnroll({ matricNos, code }: BulkEnrollStudentDto) {
+  async bulkEnroll(payload: BulkEnrollStudentDto) {
+    const { matricNos, code } = payload;
     const course = await Course.findOne({ where: { code } });
     if (!course)
       return this.HandleError(new NotFoundException('Course Not Found'));
@@ -165,7 +179,8 @@ export class StudentService extends BaseService {
     return this.Results(enrrolments);
   }
 
-  async getEnrollmentStatus({ matricNo, code }: EnrollStudentDto) {
+  async getEnrollmentStatus(payload: EnrollStudentDto) {
+    const { matricNo, code } = payload;
     const enrollment = await Enrollment.findOne({ where: { matricNo, code } });
 
     // const status = enrollment ? enrollment.status : EnrollmentStatus.NOT_ENROLLED;
@@ -185,7 +200,6 @@ export class StudentService extends BaseService {
 
     return this.Results(courses);
   }
-
 
   async getEnrolledStudents(code: string) {
     const enrrolments = await Enrollment.findAll({

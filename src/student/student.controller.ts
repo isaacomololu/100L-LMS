@@ -15,7 +15,7 @@ export class StudentController extends BaseController {
         super();
     }
 
-    @Post()
+    @Get()
     async getStudentByMatric(@Body() form: GetStudentDto) {
         const student = await this.studentService.getStudentByMatric(form);
         if (student.error) return student.errMessage;
@@ -26,8 +26,8 @@ export class StudentController extends BaseController {
     }
 
     @Patch()//might need to collect matricNo as param
-    async updateStudentProfile(@Body() form: UpdateStudentProfileDto) {
-        const student = await this.studentService.updateStudentProfile(form);
+    async updateStudentProfile(@Query('matricNo') matricNo: string, @Body() form: UpdateStudentProfileDto) {
+        const student = await this.studentService.updateStudentProfile(matricNo, form);
         if (student.error) return student.errMessage;
         return this.response({
             message: 'Student update',
@@ -65,12 +65,12 @@ export class StudentController extends BaseController {
         });
     }
 
-    @Patch('/enroll')
+    @Delete('/unenroll')
     async unenroll(@Body() form: EnrollStudentDto) {
         const student = await this.studentService.unenroll(form);
         if (student.error) return student.errMessage;
         return this.response({
-            message: 'Student unenrolled for course',
+            message: 'Student unenrolled from course',
             data: student.data,
         });
     }
@@ -100,7 +100,7 @@ export class StudentController extends BaseController {
         const students = await this.studentService.getEnrolledStudents(code);
         if (students.isError) throw students.error;
         return this.response({
-            message: 'Courses retrived',
+            message: 'Students retrived',
             data: students.data
         });
     }
@@ -110,7 +110,7 @@ export class StudentController extends BaseController {
         const status = await this.studentService.getEnrollmentStatus(form);
         if (status.isError) throw status.error;
         return this.response({
-            message: 'Courses retrived',
+            message: 'Status retrived',
             data: status.data
         });
     }

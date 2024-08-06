@@ -12,10 +12,10 @@ export class Student extends Model {
   @Column({ type: DataTypes.STRING, allowNull: false, unique: true })
   public email: string;
 
-  @Column({ type: DataTypes.STRING, allowNull: false })
+  @Column({ type: DataTypes.STRING, allowNull: false, unique: false })
   public firstName: string;
 
-  @Column({ type: DataTypes.STRING, allowNull: false })
+  @Column({ type: DataTypes.STRING, allowNull: false, unique: false })
   public otherName: string;
 
   @Column({ type: DataTypes.STRING, allowNull: false })
