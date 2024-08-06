@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Req, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Req, Param, Delete, Query, Get } from '@nestjs/common';
 import { BaseController } from 'src/common';
 import { StudentService } from './student.service';
 import {
@@ -6,6 +6,7 @@ import {
     UpdateStudentProfileDto,
     ChangePasswordDto,
     EnrollStudentDto,
+    BulkEnrollStudentDto,
 } from './dtos';
 
 @Controller('student')
@@ -59,20 +60,69 @@ export class StudentController extends BaseController {
         const student = await this.studentService.enrollStudent(form);
         if (student.error) return student.errMessage;
         return this.response({
-            message: 'Student enrolled',
+            message: 'Student enrolled for course',
             data: student.data,
         });
     }
 
-    @Delete('/enroll')
+    @Patch('/enroll')
     async unenroll(@Body() form: EnrollStudentDto) {
         const student = await this.studentService.unenroll(form);
         if (student.error) return student.errMessage;
         return this.response({
-            message: 'Student unenrolled',
+            message: 'Student unenrolled for course',
             data: student.data,
         });
     }
 
+    @Patch('/renroll')
+    async renrollStudent(@Body() form: EnrollStudentDto) {
+        const renroll = await this.studentService.renrollStudent(form);
+        if (renroll.isError) throw renroll.error;
+        return this.response({
+            message: 'You have renrolled for this course',
+            data: renroll.data
+        });
+    }
+
+    @Get('/student-courses')
+    async studentCourses(@Query('matricNo') matricNo: string) {
+        const courses = await this.studentService.getStudentCourses(matricNo);
+        if (courses.isError) throw courses.error;
+        return this.response({
+            message: 'Courses retrived',
+            data: courses.data
+        });
+    }
+
+    @Get('/students')
+    async enrolledStudents(@Query('code') code: string) {
+        const students = await this.studentService.getEnrolledStudents(code);
+        if (students.isError) throw students.error;
+        return this.response({
+            message: 'Courses retrived',
+            data: students.data
+        });
+    }
+
+    @Get('/status')
+    async enrollmentStatus(@Query() form: EnrollStudentDto) {
+        const status = await this.studentService.getEnrollmentStatus(form);
+        if (status.isError) throw status.error;
+        return this.response({
+            message: 'Courses retrived',
+            data: status.data
+        });
+    }
+
+    @Post('/bulk-enroll')
+    async bulkEnroll(@Body() form: BulkEnrollStudentDto) {
+        const enrolled = await this.studentService.bulkEnroll(form);
+        if (enrolled.isError) throw enrolled.error;
+        return this.response({
+            message: 'Enrolled for course',
+            data: enrolled.data
+        });
+    }
 
 }

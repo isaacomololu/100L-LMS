@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { BaseService } from 'src/common';
 import { Course, Enrollment, Student } from 'src/database/models';
+import { EnrollmentStatus } from "src/database/models/enrollment.model";
 import {
   UpdateStudentProfileDto,
   ChangePasswordDto,
   EnrollStudentDto,
   GetStudentDto,
+  BulkEnrollStudentDto,
 } from './dtos';
 import { where } from 'sequelize';
 
@@ -100,11 +102,14 @@ export class StudentService extends BaseService {
 
     const alreadyEnrolled = await Enrollment.findOne({ where: { matricNo } });
     if (alreadyEnrolled)
-      return this.HandleError(new BadRequestException('The student is already enrolled'));
+      return this.HandleError(new BadRequestException('This student is already enrolled'));
 
-    const enroll = await Student.create({
+    const enroll = await Enrollment.create({
       matricNo,
       code,
+      status: EnrollmentStatus.ACTIVE,
+      enrollmentDate: new Date(),
+      dropDate: null
     });
 
     return this.Results(enroll);
@@ -121,8 +126,80 @@ export class StudentService extends BaseService {
     if (!enrolled)
       return this.HandleError(new NotFoundException('This student is not enrrolled'));
 
-    await enrolled.destroy();
-    return this.Results(null);
+    enrolled.status = EnrollmentStatus.DROPPED;
+    enrolled.dropDate = new Date();
+    await enrolled.save();
+    return this.Results(enrolled);
+  }
+
+  async renrollStudent({ matricNo, code }: EnrollStudentDto) {
+    const enrollment = await Enrollment.findOne({ where: { matricNo, code } });
+    if (!enrollment)
+      return this.HandleError(new NotFoundException('This student has not enrolled for this course'));
+    if (enrollment.status !== EnrollmentStatus.DROPPED)
+      return this.HandleError(new BadRequestException('This student is still enrroled for this course'));
+
+    enrollment.status = EnrollmentStatus.ACTIVE;
+    enrollment.dropDate = null;
+    await enrollment.save();
+
+    return this.Results(enrollment);
+  }
+
+  async bulkEnroll({ matricNos, code }: BulkEnrollStudentDto) {
+    const course = await Course.findOne({ where: { code } });
+    if (!course)
+      return this.HandleError(new NotFoundException('Course Not Found'));
+
+    const enrrolments = await Promise.all(
+      matricNos.map(async (matricNo) => {
+        try {
+          return await this.enrollStudent({ matricNo, code, });
+        } catch (error) {
+          console.error(`Failed to enroll student ${matricNo} in course ${code}:`, error.message);
+          return null;
+        }
+      })
+    );
+
+    return this.Results(enrrolments);
+  }
+
+  async getEnrollmentStatus({ matricNo, code }: EnrollStudentDto) {
+    const enrollment = await Enrollment.findOne({ where: { matricNo, code } });
+
+    // const status = enrollment ? enrollment.status : EnrollmentStatus.NOT_ENROLLED;
+    const status = enrollment.status;
+    return this.Results(status);
+  }
+
+  async getStudentCourses(matricNo: string) {
+    const enrolledCourses = await Enrollment.findAll({
+      where: { matricNo: matricNo, status: EnrollmentStatus.ACTIVE },
+      include: [{ model: Course }]
+    });
+    if (enrolledCourses.length === 0) {
+      return this.HandleError(new NotFoundException('courses not found'));
+    }
+    const courses = enrolledCourses.map(enrollment => enrollment.code);
+
+    return this.Results(courses);
+  }
+
+
+  async getEnrolledStudents(code: string) {
+    const enrrolments = await Enrollment.findAll({
+      where: { code: code, status: EnrollmentStatus.ACTIVE },
+      include: [{ model: Student }]
+    });
+
+    if (enrrolments.length === 0) {
+      return this.HandleError(new NotFoundException('students not found'));
+    }
+
+    const students = enrrolments.map(enrrolment => enrrolment.matricNo);
+
+    return this.Results(students);
   }
 
   async getStudentGrades() { }
