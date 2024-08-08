@@ -1,5 +1,5 @@
-import { Column, PrimaryKey, IsUUID, Model, BelongsToMany, Table, HasMany, Index } from 'sequelize-typescript';
-import { DataTypes, UUIDV4 } from 'sequelize';
+import { Column, PrimaryKey, Model, BelongsToMany, Table } from 'sequelize-typescript';
+import { DataTypes } from 'sequelize';
 import * as bcrypt from 'bcryptjs';
 import { Course, Enrollment } from './';
 

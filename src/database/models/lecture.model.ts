@@ -1,6 +1,7 @@
-import { Column, Model, Table, DataType, ForeignKey, BelongsTo, PrimaryKey, IsUUID } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, ForeignKey, BelongsTo, PrimaryKey, IsUUID, CreatedAt, UpdatedAt } from 'sequelize-typescript';
 import { DataTypes, UUIDV4 } from 'sequelize';
 import { Course } from './course.model';
+import { Lecturer } from './lecturer.model';
 
 @Table
 export class Lecture extends Model<Lecture> {
@@ -20,21 +21,27 @@ export class Lecture extends Model<Lecture> {
 
     @Column({
         type: DataType.TEXT,
-        allowNull: false,
+        allowNull: true,
     })
-    content: string;
+    description: string;
 
     @Column({
         type: DataType.DATE,
-        allowNull: false,
+        allowNull: true,
     })
-    date: Date;
+    scheduledDate: Date;
 
     @Column({
-        type: DataType.ENUM('TEXT', 'VIDEO', 'PDF'),
-        allowNull: false,
+        type: DataType.BOOLEAN,
+        defaultValue: false,
     })
-    type: 'TEXT' | 'VIDEO';
+    isCompleted: boolean;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
+    materialUrl: string;
 
     @Column({
         type: DataType.STRING,
@@ -47,32 +54,87 @@ export class Lecture extends Model<Lecture> {
         type: DataType.STRING,
         allowNull: false,
     })
-    courseId: string;
+    code: string;
 
     @BelongsTo(() => Course)
     course: Course;
+
+    @ForeignKey(() => Lecturer)
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    lecturerId: string;
+
+    @BelongsTo(() => Lecturer)
+    lecturer: Lecturer;
+
+    @CreatedAt
+    createdAt: Date;
+
+    @UpdatedAt
+    updatedAt: Date;
 }
 
-//     @ForeignKey(() => Course)
-//     @Column({
-//         type: DataType.STRING,
-//         allowNull: false,
-//     })
-//     courseId: string;
+// @Column({
+//     type: DataType.STRING,
+//     allowNull: false,
+// })
+// title: string;
 
-//     @ForeignKey(() => Lecturer)
-//     @Column({
-//         type: DataType.STRING,
-//         allowNull: false,
-//     })
-//     lecturerId: string;
+// @Column({
+//     type: DataType.TEXT,
+//     allowNull: true,
+// })
+// description: string;
 
-//     @BelongsTo(() => Course)
-//     course: Course;
+// @Column({
+//     type: DataType.DATE,
+//     allowNull: true,
+// })
+// scheduledDate: Date;
 
-//     @BelongsTo(() => Lecturer)
-//     lecturer: Lecturer;
+// @Column({
+//     type: DataType.BOOLEAN,
+//     defaultValue: false,
+// })
+// isCompleted: boolean;
 
-//     @HasMany(() => CourseMaterial)
-//     materials: CourseMaterial[];
-// }
+// @Column({
+//     type: DataType.STRING,
+//     allowNull: true,
+// })
+// materialUrl: string;
+
+// @ForeignKey(() => Course)
+// @Column({
+//     type: DataType.STRING,
+//     allowNull: false,
+// })
+// courseCode: string;
+
+// @BelongsTo(() => Course)
+// course: Course;
+
+// @ForeignKey(() => Lecturer)
+// @Column({
+//     type: DataType.UUID,
+//     allowNull: false,
+// })
+// lecturerId: string;
+
+// @BelongsTo(() => Lecturer)
+// lecturer: Lecturer;
+
+// // You might want to add these fields as well
+// @Column({
+//     type: DataType.DATE,
+//     defaultValue: DataType.NOW,
+// })
+// createdAt: Date;
+
+// @Column({
+//     type: DataType.DATE,
+//     defaultValue: DataType.NOW,
+// })
+// updatedAt: Date;

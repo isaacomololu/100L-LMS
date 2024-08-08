@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, BelongsToMany, ForeignKey, PrimaryKey, IsUUID, HasMany, BelongsTo, Index } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, PrimaryKey, HasMany } from 'sequelize-typescript';
 import { Lecturer, Lecture, Student } from './';
 
 @Table
