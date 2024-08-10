@@ -24,8 +24,8 @@ export class LectureController extends BaseController {
         })
     }
 
-    @Get()
-    async getLectureById(@Query() form: GetLectureByIdDto) {
+    @Get('/id')
+    async getLectureById(@Query() form: GetLectureByIdDto) { //Only Lecturer access. Change dto and use guard
         const lecture = await this.lectureService.getLectureById(form);
         if (lecture.isError) return lecture.error;
         return this.response({
@@ -34,7 +34,7 @@ export class LectureController extends BaseController {
         })
     }
 
-    @Get()
+    @Get('/title')
     async getLectureByTitle(@Query() form: GetLectureByTitleDto) {
         const lecture = await this.lectureService.getLectureByTitle(form);
         if (lecture.isError) return lecture.error;
@@ -44,18 +44,18 @@ export class LectureController extends BaseController {
         })
     }
 
-    @Get('/lecturers')
-    async getLectuer(@Query('id') id: string) {
-        const lecturer = await this.lectureService.getLectuer(id);
-        if (lecturer.isError) return lecturer.error;
-        return this.response({
-            data: lecturer.data,
-            message: 'Lecturer Retrived'
-        })
-    }
+    // @Get('/lecturers')
+    // async getLectuer(@Query('id') id: string) {
+    //     const lecturer = await this.lectureService.getLectuer(id);
+    //     if (lecturer.isError) return lecturer.error;
+    //     return this.response({
+    //         data: lecturer.data,
+    //         message: 'Lecturer Retrived'
+    //     })
+    // }
 
     @Patch()
-    async updateLecture(@Query('id') id: string, form: UpdateLectureDto) {
+    async updateLecture(@Query('id') id: string, @Body() form: UpdateLectureDto) {
         const lecture = await this.lectureService.updateLecture(id, form);
         if (lecture.isError) return lecture.error;
         return this.response({
@@ -74,9 +74,9 @@ export class LectureController extends BaseController {
         })
     }
 
-    @Put('/schedule-lecture')
-    async scheduleLecture(@Query() form: ScheduleLectureDto) {
-        const lecture = await this.lectureService.scheduleLecture(form);
+    @Put('/reschedule-lecture')
+    async rescheduleLecture(@Query() form: ScheduleLectureDto) {
+        const lecture = await this.lectureService.rescheduleLecture(form);
         if (lecture.isError) return lecture.error;
         return this.response({
             data: lecture.data,

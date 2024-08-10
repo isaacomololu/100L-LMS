@@ -72,19 +72,40 @@ export class LectureService extends BaseService {
         return this.Results(lecture);
     }
 
-    async getLectuer(id: string) {
-        const lecture = await Lecture.findOne({ where: { id: id } });
-        if (!lecture)
-            return this.HandleError(new NotFoundException('lecture not found'));
-    }
+    //Unnesccesary if retriving the lecture shows us the lecturer
+    // async getLectuer(id: string) {
+    //     const lecture = await Lecture.findOne({ where: { id: id } });
+    //     if (!lecture)
+    //         return this.HandleError(new NotFoundException('lecture not found'));
+    //     const lecturerId = lecture.lecturerId;
+
+    // }
 
     async getStudentAttendance() { }
 
-    async updateLecture(id: string, payload: UpdateLectureDto) {
+    async updateLecture(id: string, {
+        lecturerId,
+        code,
+        title,
+        description,
+        scheduledDate,
+        materialUrl,
+        videoUrl
+    }: UpdateLectureDto
+    ) {
         const lecture = await Lecture.findOne({ where: { id } });
         if (!lecture)
             return this.HandleError(new NotFoundException('Lecture not found'));
-        await lecture.update(payload);
+        const updatePayload: any = {
+            ...(lecturerId ? { lecturerId } : {}),
+            ...(code ? { code } : {}),
+            ...(title ? { title } : {}),
+            ...(description ? { description } : {}),
+            ...(scheduledDate ? { scheduledDate } : {}),
+            ...(materialUrl ? { materialUrl } : {}),
+            ...(videoUrl ? { videoUrl } : {}),
+        };
+        await lecture.update(updatePayload);
         return this.Results(lecture);
     }
 
@@ -100,7 +121,7 @@ export class LectureService extends BaseService {
     async uploadLectureMaterial(id: string, file) { }
 
     // Decide if this should occur at lecture creation or when the method is called
-    async scheduleLecture(payload: ScheduleLectureDto) {
+    async rescheduleLecture(payload: ScheduleLectureDto) {
         const { id, date } = payload
         const lecture = await Lecture.findOne({ where: { id } });
         if (!lecture)

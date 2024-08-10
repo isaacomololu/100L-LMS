@@ -1,7 +1,14 @@
 import { Controller, Post, Delete, Get, Body, Query } from '@nestjs/common';
 import { BaseController } from 'src/common';
 import { LecturerService } from './lecturer.service';
-import { AssignLecturerDto, GetLecturerCoursesDto, GetCourseLecturersDto, SignupDto, SigninDto, GetLecturerByIdDto } from './dtos';
+import {
+    AssignLecturerDto,
+    GetCourseLecturersDto,
+    SignupDto,
+    SigninDto,
+    GetLecturerByIdDto,
+    GetLecturerByEmailDto
+} from './dtos';
 
 @Controller('lecturer')
 export class LecturerController extends BaseController {
@@ -30,9 +37,19 @@ export class LecturerController extends BaseController {
         });
     }
 
-    @Get('')
+    @Get('/id')
     async getLecturerById(@Query() form: GetLecturerByIdDto) {
         const lecturer = await this.lecturerService.getLecturerById(form);
+        if (lecturer.errMessage) throw lecturer.error;
+        return this.response({
+            message: 'lecturer Retrived',
+            data: lecturer.data,
+        });
+    }
+
+    @Get('/email')
+    async getLecturerByEmail(@Query() form: GetLecturerByEmailDto) {
+        const lecturer = await this.lecturerService.getLecturerByEmail(form);
         if (lecturer.errMessage) throw lecturer.error;
         return this.response({
             message: 'lecturer Retrived',
