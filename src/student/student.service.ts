@@ -50,7 +50,6 @@ export class StudentService extends BaseService {
       return this.HandleError(new NotFoundException('Student Not Found'));
 
     const updatePayload: any = {
-      ...(matricNo ? { matricNo } : {}),
       ...(email ? { email } : {}),
       ...(firstName ? { firstName } : {}),
       ...(otherName ? { otherName } : {}),

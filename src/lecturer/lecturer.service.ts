@@ -69,9 +69,9 @@ export class LecturerService extends BaseService {
     }
 
     async signin(payload: SigninDto) {
-        const { matricNo, password } = payload
+        const { id, password } = payload
 
-        const lecturer = await await Lecturer.findOne({ where: { matricNo } });;
+        const lecturer = await await Lecturer.findOne({ where: { id } });;
 
         if (!lecturer || !lecturer.validatePassword(password))
             return this.HandleError(
@@ -120,7 +120,6 @@ export class LecturerService extends BaseService {
         const lecturer = getLecturer.data;
 
         const updatePayload: any = {
-            ...(id ? { id } : {}),
             ...(email ? { email } : {}),
             ...(firstName ? { firstName } : {}),
             ...(otherName ? { otherName } : {}),

@@ -94,5 +94,10 @@ export class AuthService extends BaseService {
     return this.Results({ email });
   }
 
+  validateToken(token: string) {
+    return this.jwtService.verify(token, {
+      secret: process.env.JWT_SECRET_KEY
+    });
+  }
 }
 

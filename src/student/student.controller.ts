@@ -124,5 +124,4 @@ export class StudentController extends BaseController {
             data: enrolled.data
         });
     }
-
 }

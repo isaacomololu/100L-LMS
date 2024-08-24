@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from "class-validator";
 export class SigninDto {
     @IsString()
     @IsNotEmpty()
-    matricNo: string;
+    id: string;
 
     @IsString()
     @IsNotEmpty()
