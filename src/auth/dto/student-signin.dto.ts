@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class SigninDto {
+export class StudentSigninDto {
     @IsString()
     @IsNotEmpty()
     matricNo: string;

@@ -45,6 +45,13 @@ export class Lecturer extends Model {
     @Column({ type: DataTypes.STRING })
     public avatar: string;
 
+    @Column({
+        type: DataTypes.STRING,
+        defaultValue: Date.now(),
+        allowNull: false,
+    })
+    public lastLoggedInAt: string;
+
     @ForeignKey(() => Course)
     @Column
     public code: string;

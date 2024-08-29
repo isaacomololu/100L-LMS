@@ -1,6 +1,10 @@
-import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsDate, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class CreateAssignmentDto {
+    @IsString()
+    @IsNotEmpty()
+    lecturerId: string;
+
     @IsString()
     @IsNotEmpty()
     code: string;
@@ -25,7 +29,7 @@ export class CreateAssignmentDto {
     @IsNotEmpty()
     totalMarks: string;
 
-    @IsDate()
-    @IsNotEmpty()
-    dueDate: Date;
+    // @IsDate()
+    // @IsOptional()
+    // dueDate: string;
 }

@@ -16,34 +16,23 @@ export class LecturerController extends BaseController {
         super();
     }
 
-
-    @Post('signup')
-    async signUp(@Body() form: SignupDto) {
-        const lecturer = await this.lecturerService.signup(form);
-        if (lecturer.errMessage) throw lecturer.error;
-        return this.response({
-            message: 'lecturer Created Succesfully',
-            data: lecturer.data,
-        });
-    }
-
-    @Post('signin')
-    async signIn(@Body() form: SigninDto) {
-        const lecturer = await this.lecturerService.signin(form);
-        if (lecturer.errMessage) throw lecturer.error;
-        return this.response({
-            message: 'lecturer Signed-in Succesfully',
-            data: lecturer.data,
-        });
-    }
-
     @Get('/id')
     async getLecturerById(@Query() form: GetLecturerByIdDto) {
         const lecturer = await this.lecturerService.getLecturerById(form);
         if (lecturer.errMessage) throw lecturer.error;
         return this.response({
-            message: 'lecturer Retrived',
+            message: 'Lecturer Retrived',
             data: lecturer.data,
+        });
+    }
+
+    @Get()
+    async getLecturers() {
+        const lecturers = await this.lecturerService.getLecturers();
+        if (lecturers.errMessage) throw lecturers.error;
+        return this.response({
+            message: 'Lecturers Retrived',
+            data: lecturers.data,
         });
     }
 

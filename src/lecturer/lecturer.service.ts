@@ -11,76 +11,11 @@ import {
     GetLecturerByIdDto,
     GetLecturerByEmailDto,
 } from './dtos';
-import { JwtService } from '@nestjs/jwt';
-import { JWTPayload } from 'src/auth/auth.interface';
-import { Op } from 'sequelize';
 
 @Injectable()
 export class LecturerService extends BaseService {
-    constructor(private readonly jwtService: JwtService) {
+    constructor() {
         super();
-    }
-
-    async signJWT(payload: any) {
-        const accessToken = this.jwtService.sign(payload);
-        return this.Results(accessToken);
-    }
-
-    async verifyJwt(jwt: string) {
-        try {
-            const user: JWTPayload = this.jwtService.verify(jwt);
-            return this.Results(user);
-        } catch (error) {
-            if (error.message.includes('expired')) {
-                return this.HandleError(
-                    new UnauthorizedException('Token Expired! Please Sign in.'),
-                );
-            }
-            if (error.message.includes('invalid')) {
-                return this.HandleError(
-                    new UnauthorizedException('Invalid Token! Please Sign in.'),
-                );
-            }
-            throw error;
-        }
-    }
-
-    async signup(payload: SignupDto) {
-        const { email, firstName, ...rest } = payload
-
-        const exist = await Lecturer.findOne({ where: { [Op.or]: [{ email }] } });
-        if (exist)
-            return this.HandleError(
-                new BadRequestException('Lecturer already exist')
-            );
-
-        if (exist?.email === email)
-            return this.HandleError(
-                new BadRequestException('Lecturer with this Id already exists')
-            );
-
-        const lecturer = await Lecturer.create({
-            ...rest,
-            email,
-            firstName
-        });
-
-        return this.Results(lecturer);
-    }
-
-    async signin(payload: SigninDto) {
-        const { id, password } = payload
-
-        const lecturer = await await Lecturer.findOne({ where: { id } });;
-
-        if (!lecturer || !lecturer.validatePassword(password))
-            return this.HandleError(
-                new BadRequestException("Incorrect Credentials")
-            );
-
-        const accessToken = this.signJWT(lecturer);
-
-        return this.Results(accessToken);
     }
 
     async getLecturerById(payload: GetLecturerByIdDto) {
@@ -188,6 +123,11 @@ export class LecturerService extends BaseService {
         }
 
         const lecturers = course.lecturers;
+        return this.Results(lecturers);
+    }
+
+    async getLecturers() {
+        const lecturers = await Lecturer.findAll();
         return this.Results(lecturers);
     }
 

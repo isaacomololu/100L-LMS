@@ -1,6 +1,6 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, HasMany, PrimaryKey, IsUUID } from 'sequelize-typescript';
 import { DataTypes, UUIDV4 } from 'sequelize';
-import { Question } from './';
+import { Question, Student } from './';
 
 @Table
 export class Answer extends Model<Answer> {
@@ -44,4 +44,11 @@ export class Answer extends Model<Answer> {
 
     @BelongsTo(() => Question)
     question: Question;
+
+    @ForeignKey(() => Student)
+    @Column
+    studentId: string;
+
+    @BelongsTo(() => Student)
+    student: Student;
 }

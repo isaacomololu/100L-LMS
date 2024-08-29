@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { BaseService } from 'src/common';
-import { Answer, Assignment, Course, Lecture, Question, Student, Test } from 'src/database/models';
+import { Answer, Assignment, Course, Lecture, Lecturer, Question, Student, Test } from 'src/database/models';
 import {
     CreateAssignmentDto,
     CreateQuestionDto,
@@ -24,7 +24,7 @@ export class AssessmentService extends BaseService {
 
     async createTest(payload: CreateTestDto) {
         const { lecturerId, code, ...title } = payload;
-        const lecturer = await Lecture.findOne({ where: { id: lecturerId } });
+        const lecturer = await Lecturer.findOne({ where: { id: lecturerId } });
         if (!lecturer)
             return this.HandleError(new NotFoundException('Lecturer Not Found'));
 
@@ -41,20 +41,21 @@ export class AssessmentService extends BaseService {
     }
 
     async createAssignment(payload: CreateAssignmentDto) {
-        const { code, title, ...description } = payload;
+        const { lecturerId, code, title, ...description } = payload;
         const course = await Course.findOne({ where: { code } });
         if (!course)
-            return this.HandleError(new NotFoundException('Course Not Fozund'));
-        const test = await Assignment.create({
+            return this.HandleError(new NotFoundException('Course Not Found'));
+
+        const assignment = await Assignment.create({
             code,
             title,
             ...description
         });
 
-        return this.Results(test);
+        return this.Results(assignment);
     }
 
-    async getTest(payload: GetAssesmentDto, userId: string) {
+    async getTest(payload: GetAssesmentDto, lecturerId: string) {
         const { id, code } = payload;
 
         const course = await Course.findOne({ where: { code } });
@@ -68,7 +69,18 @@ export class AssessmentService extends BaseService {
         return this.Results(test);
     }
 
-    async getAssignment(payload: GetAssesmentDto, userId: string) { // Should have guards to ensure who is accessing
+    async getAllTest() {
+        const test = await Test.findAll();
+        return this.Results(test);
+    }
+
+    async getAllAssignment() {
+        const test = await Assignment.findAll();
+        return this.Results(test);
+    }
+
+
+    async getAssignment(payload: GetAssesmentDto, lecturerId: string) { // Should have guards to ensure who is accessing
         const { id, code } = payload;
 
         const course = await Course.findOne({ where: { code } });
@@ -136,7 +148,7 @@ export class AssessmentService extends BaseService {
         }
 
         await assignment.update(update);
-        return this.Results(test);
+        return this.Results(assignment);
     }
 
     async addQuestionToTest(testId: string, payload: CreateQuestionDto) {
@@ -199,11 +211,16 @@ export class AssessmentService extends BaseService {
         return this.Results(null);
     }
 
-    async submitAnswer(questionId: string, payload: SubmitAnswerDto) {
-        const { content } = payload;
+    async submitAnswer(matricNo: string, payload: SubmitAnswerDto) {
+        const { questionId, content } = payload;
+
+        const student = await Student.findOne({ where: { matricNo } });
+        if (!student) throw new Error('Student not found');
+
         const question = await Question.findByPk(questionId);
         if (!question) throw new Error('Question not found');
-        const answer = Answer.create({
+
+        const answer = await Answer.create({
             content,
             submissionDate: new Date(),
             submitted: true,
@@ -222,6 +239,8 @@ export class AssessmentService extends BaseService {
             isGraded: true,
         };
         await answer.update(update);
+
+        return this.Results(answer)
     }
 
     async getCourseTests(code: string) {

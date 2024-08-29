@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsObject } from "class-validator";
 
 export class CreateQuestionDto {
     @IsNotEmpty()
@@ -10,7 +10,7 @@ export class CreateQuestionDto {
     type: 'mcq' | 'theory';
 
     @IsOptional()
-    @IsString()
+    @IsObject()
     options?: { A: string; B: string; C: string; D: string };
 
     @IsOptional()

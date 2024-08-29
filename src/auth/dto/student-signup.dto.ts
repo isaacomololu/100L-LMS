@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsString, IsUUID, IsEmail } from 'class-validator';
 
-export class SignupDto {
+export class StudentSignupDto {
   @IsString()
   @IsNotEmpty()
   matricNo: string;

@@ -21,8 +21,8 @@ export class Assignment extends Model<Assignment> {
     @Column({ type: DataTypes.INTEGER, allowNull: false })
     totalMarks: string;
 
-    @Column({ type: DataTypes.DATE, allowNull: false })
-    dueDate: Date;
+    // @Column({ type: DataTypes.DATE, allowNull: false })
+    // dueDate: string;
 
     @ForeignKey(() => Course)
     @Column({
