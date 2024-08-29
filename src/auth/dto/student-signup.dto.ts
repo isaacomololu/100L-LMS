@@ -1,9 +1,11 @@
-import { Transform } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsString, IsUUID, IsEmail } from 'class-validator';
+import { Matches, IsNotEmpty, IsString, IsUUID, IsEmail } from 'class-validator';
 
 export class StudentSignupDto {
   @IsString()
   @IsNotEmpty()
+  @Matches(/^[A-Z]{3}\/\d{2}\/\d{4}$/, {
+    message: 'matricNo must be in the format DDD/YY/NNNN (e.g., SEN/18/7839)'
+  })
   matricNo: string;
 
   @IsEmail()
