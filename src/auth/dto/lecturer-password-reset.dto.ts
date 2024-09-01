@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
 
 export class LecturerPasswordResetDTO {
     @Transform(({ value }) => value.toLowerCase())
@@ -10,4 +10,9 @@ export class LecturerPasswordResetDTO {
     @IsString()
     @IsNotEmpty()
     id: string;
+
+    @IsNotEmpty()
+    @IsStrongPassword()
+    @IsString()
+    password: string;
 }

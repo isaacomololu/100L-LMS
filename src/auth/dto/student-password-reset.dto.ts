@@ -1,13 +1,26 @@
-import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+} from 'class-validator';
 
 export class StudentPasswordResetDTO {
-  @Transform(({ value }) => value.toLowerCase())
+  @IsNotEmpty()
+  @IsStrongPassword()
+  @IsString()
+  matricNo: string;
+
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @IsString()
   @IsNotEmpty()
-  matricNo: string;
+  @IsStrongPassword()
+  @IsString()
+  password: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // token: string;
 }

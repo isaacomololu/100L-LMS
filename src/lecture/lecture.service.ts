@@ -36,6 +36,40 @@ export class LectureService extends BaseService {
         return this.Results(lecture);
     }
 
+    async updateLecture(id: string, {
+        lecturerId,
+        code,
+        title,
+        description,
+        scheduledDate,
+        materialUrl,
+        videoUrl
+    }: UpdateLectureDto
+    ) {
+        const lecture = await Lecture.findOne({ where: { id } });
+        if (!lecture)
+            return this.HandleError(new NotFoundException('Lecture not found'));
+        const updatePayload: any = {
+            ...(lecturerId ? { lecturerId } : {}),
+            ...(code ? { code } : {}),
+            ...(title ? { title } : {}),
+            ...(description ? { description } : {}),
+            ...(scheduledDate ? { scheduledDate } : {}),
+            ...(materialUrl ? { materialUrl } : {}),
+            ...(videoUrl ? { videoUrl } : {}),
+        };
+        await lecture.update(updatePayload);
+        return this.Results(lecture);
+    }
+
+    async deleteLecture(id: string) {
+        const lecture = await Lecture.findOne({ where: { id } });
+        if (!lecture)
+            return this.HandleError(new NotFoundException('Lecture not found'));
+        await lecture.destroy();
+        return this.Results(null);
+    }
+
     async getLectureById(payload: GetLectureByIdDto) {
         const { id, lecturerId, code } = payload;
 
@@ -83,39 +117,7 @@ export class LectureService extends BaseService {
 
     async getStudentAttendance() { }
 
-    async updateLecture(id: string, {
-        lecturerId,
-        code,
-        title,
-        description,
-        scheduledDate,
-        materialUrl,
-        videoUrl
-    }: UpdateLectureDto
-    ) {
-        const lecture = await Lecture.findOne({ where: { id } });
-        if (!lecture)
-            return this.HandleError(new NotFoundException('Lecture not found'));
-        const updatePayload: any = {
-            ...(lecturerId ? { lecturerId } : {}),
-            ...(code ? { code } : {}),
-            ...(title ? { title } : {}),
-            ...(description ? { description } : {}),
-            ...(scheduledDate ? { scheduledDate } : {}),
-            ...(materialUrl ? { materialUrl } : {}),
-            ...(videoUrl ? { videoUrl } : {}),
-        };
-        await lecture.update(updatePayload);
-        return this.Results(lecture);
-    }
 
-    async deleteLecture(id: string) {
-        const lecture = await Lecture.findOne({ where: { id } });
-        if (!lecture)
-            return this.HandleError(new NotFoundException('Lecture not found'));
-        await lecture.destroy();
-        return this.Results(null);
-    }
 
     // Learn how to upload files in nest 
     async uploadLectureMaterial(id: string, file) { }

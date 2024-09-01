@@ -131,8 +131,8 @@ export class AuthService extends BaseService {
     return this.Results(student);
   }
 
-  async initiateLecturerPasswordReset(payload: LecturerPasswordResetDTO) {
-    const { email, id } = payload;
+  async lecturerPasswordReset(payload: LecturerPasswordResetDTO) {
+    const { email, id, password } = payload;
     const lecturer = await Lecturer.findOne({ where: { id } });
 
     if (!lecturer)
@@ -140,19 +140,23 @@ export class AuthService extends BaseService {
         new NotFoundException('Lecturer not found')
       );
 
-    return this.Results({ email });
+    await lecturer.update({ password });
+
+    return this.Results({ lecturer });
   }
 
-  async initiateStudentPasswordReset(payload: StudentPasswordResetDTO) {
-    const { email, matricNo } = payload;
+  async studentPasswordReset(payload: StudentPasswordResetDTO) {
+    const { matricNo, email, password } = payload;
     const student = await Student.findOne({ where: { matricNo } });
 
     if (!student)
       return this.HandleError(
-        new NotFoundException('Student not found')
+        new NotFoundException('Student does not exist'),
       );
 
-    return this.Results({ email });
+    await student.update({ password });
+
+    return this.Results(student);
   }
 }
 

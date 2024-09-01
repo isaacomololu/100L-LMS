@@ -1,7 +1,14 @@
 import { Controller, Post, Body, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { BaseController } from 'src/common';
-import { StudentSigninDto, LecturerSigninDto, StudentSignupDto, LecturerSignupDto, LecturerPasswordResetDTO, StudentPasswordResetDTO } from './dto';
+import {
+    StudentSigninDto,
+    LecturerSigninDto,
+    StudentSignupDto,
+    LecturerSignupDto,
+    LecturerPasswordResetDTO,
+    StudentPasswordResetDTO
+} from './dto';
 
 @Controller('auth')
 export class AuthController extends BaseController {
@@ -51,7 +58,7 @@ export class AuthController extends BaseController {
 
     @Patch('lecturer-reset')
     async initiateLecturerPasswordReset(@Body() form: LecturerPasswordResetDTO) {
-        const lecturer = await this.authService.initiateLecturerPasswordReset(form);
+        const lecturer = await this.authService.lecturerPasswordReset(form);
         if (lecturer.errMessage) throw lecturer.error;
         return this.response({
             message: 'Password Updated',
@@ -60,8 +67,8 @@ export class AuthController extends BaseController {
     }
 
     @Patch('student-reset')
-    async initiateStudentPasswordReset(@Body() form: StudentPasswordResetDTO) {
-        const student = await this.authService.initiateStudentPasswordReset(form);
+    async studentPasswordReset(@Body() form: StudentPasswordResetDTO) {
+        const student = await this.authService.studentPasswordReset(form);
         if (student.errMessage) throw student.error;
         return this.response({
             message: 'Password Updated',
